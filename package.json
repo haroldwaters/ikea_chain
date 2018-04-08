@@ -1,0 +1,23 @@
+{
+  "name": "ikea_chain",
+  "version": "1.0.0",
+  "description": "An ikea simulator for hyperledger composer v0.19",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/haroldwaters/ikea_chain.git"
+  },
+  "author": "Harold Waters",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/haroldwaters/ikea_chain/issues"
+  },
+  "homepage": "https://github.com/haroldwaters/ikea_chain#readme",
+  "dependencies": {
+    "generator-hyperledger-composer": "^0.19.0",
+    "yo": "^2.0.1"
+  }
+}
