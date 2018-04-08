@@ -4,25 +4,73 @@
 
 namespace gov.sweden.ikea
 
-participant SampleParticipant identified by participantId {
-  o String participantId
+enum FoodType {
+  o MEATBALLS
+}
+enum ProductType {
+  o WOOD
+  o SCREWS
+}
+
+participant Person identified by personId {
+  o String personId
   o String firstName
   o String lastName
 }
 
-asset SampleAsset identified by assetId {
-  o String assetId
-  --> SampleParticipant owner
-  o String value
+participant Customer extends Person{
+  o Integer wallet
 }
 
-transaction SampleTransaction {
-  --> SampleAsset asset
-  o String newValue
+participant Manufacturer extends Person{
+  o ProductType product
 }
 
-event SampleEvent {
-  --> SampleAsset asset
-  o String oldValue
-  o String newValue
+participant Store extends Person{
+  o String storeName
+  o String location
 }
+
+asset Furniture identified by furnitureId{
+  o String furnitureId
+  --> Person owner
+  o Parts wood
+  o Parts screws
+  o String name
+  o Integer cost
+}
+
+asset Parts identified by partsId {
+  o String partsId
+  o ProductType type
+  o Integer value
+  --> Manufacturer manufacturer
+  o Boolean installed default = false
+}
+
+asset Food identified by foodId {
+  o String foodId
+  o FoodType type
+  --> Person owner
+}
+
+transaction MakeFurniture {
+  o String furnitureId
+  o String name
+  --> Parts wood
+  --> Parts screws
+  --> Store store
+}
+
+transaction SellFurniture {
+  --> Parts wood
+  --> Parts screws
+  --> Store store
+  --> Customer customer
+}
+
+transaction SellFood {
+   --> Food food
+   --> Store store
+   --> Customer customer
+ }

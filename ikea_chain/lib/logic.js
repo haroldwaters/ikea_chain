@@ -12,32 +12,52 @@
  * limitations under the License.
  */
 
+function installed(part){
+    console.log(Object.keys(part));
+    return Object.keys(part).includes("installedIn");
+}
 'use strict';
 /**
  * Write your transction processor functions here
  */
 
 /**
- * Sample transaction
- * @param {gov.sweden.ikea.SampleTransaction} sampleTransaction
+ * MakeFurniture
+ * @param {gov.sweden.ikea.MakeFurniture} transaction
  * @transaction
  */
-async function sampleTransaction(tx) {
-    // Save the old value of the asset.
-    const oldValue = tx.asset.value;
+async function MakeFurniture(tx) {
 
-    // Update the asset with the new value.
-    tx.asset.value = tx.newValue;
+    console.log('Making furniture!');
 
-    // Get the asset registry for the asset.
-    const assetRegistry = await getAssetRegistry('gov.sweden.ikea.SampleAsset');
-    // Update the asset in the asset registry.
-    await assetRegistry.update(tx.asset);
+    let partsRegistry = await getAssetRegistry('gov.sweden.ikea.Parts');
+    let wood = await partsRegistry.get(tx.wood.partsId);
+    let screws = await partsRegistry.get(tx.screws.partsId);
 
-    // Emit an event for the modified asset.
-    let event = getFactory().newEvent('gov.sweden.ikea', 'SampleEvent');
-    event.asset = tx.asset;
-    event.oldValue = oldValue;
-    event.newValue = tx.newValue;
-    emit(event);
+    console.log([wood, screws])
+
+    if(tx.wood.type === 'WOOD' && tx.screws.type === 'SCREWS' && 
+       wood.installed === false   && screws.installed === false){
+        let furniture = getFactory().newResource('gov.sweden.ikea', 'Furniture', tx.furnitureId);
+
+
+        furniture.owner = tx.store;
+        furniture.name = tx.name;
+        furniture.cost = tx.wood.value + tx.screws.value;
+        furniture.wood = tx.wood;
+        furniture.screws = tx.screws;
+
+        let furnitureRegistry = await getAssetRegistry('gov.sweden.ikea.Furniture')
+        furnitureRegistry.add(furniture);
+        
+        let partsRegistry = await getAssetRegistry('gov.sweden.ikea.Parts')
+
+        tx.wood.installed = true;
+        tx.screws.installed = true;
+        await partsRegistry.update(tx.wood);
+        await partsRegistry.update(tx.screws);
+    }
+    else{
+        throw "FELAKTIGA DELAR!!!";
+    }
 }
